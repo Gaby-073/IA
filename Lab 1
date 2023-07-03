@@ -1,0 +1,180 @@
+Data Set 
+import pandas as pd
+
+# Ruta archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Cargar el archivo CSV en un DataFrame, especificando la codificación
+df = pd.read_csv(ruta_csv, encoding='latin-1')
+
+# Imprimir las primeras filas del DataFrame
+print(df.head())
+
+Primeros 5 campos
+import pandas as pd
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Cargar el archivo CSV en un DataFrame
+df = pd.read_csv(ruta_csv, encoding='latin-1')
+
+# Imprimir las 5 primeras filas del DataFrame
+print(df.head(5))
+
+Tamaño de filas y columnas del dataset
+import pandas as pd
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Cargar el archivo CSV en un DataFrame
+df = pd.read_csv(ruta_csv, encoding='latin-1')
+
+# Obtener el tamaño de filas y columnas
+num_filas, num_columnas = df.shape
+
+# Imprimir el tamaño de filas y columnas
+print("Número de filas:", num_filas)
+print("Número de columnas:", num_columnas)
+
+import pandas as pd
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+# Columnas de interés
+columnas_interes = ['STNAME', 'CTYNAME', 'CENSUS2010POP', 'BIRTHS2010']
+
+# Cargar el archivo CSV en un DataFrame, seleccionando solo las columnas de interés
+df = pd.read_csv(ruta_csv, encoding='latin-1', usecols=columnas_interes)
+
+# Obtener el tamaño de filas y columnas
+num_filas, num_columnas = df.shape
+
+# Imprimir el tamaño de filas y columnas
+print("Número de filas:", num_filas)
+print("Número de columnas:", num_columnas)
+print(df)
+
+Matriz de correlacion
+import pandas as pd
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Columnas de interés
+columnas_interes = ['STNAME', 'CTYNAME', 'CENSUS2010POP', 'BIRTHS2010']
+
+# Cargar el archivo CSV en un DataFrame, seleccionando solo las columnas de interés
+df = pd.read_csv(ruta_csv, encoding='latin-1', usecols=columnas_interes)
+
+# Crear la matriz de correlación
+matriz_correlacion = df.corr()
+
+# Imprimir la matriz de correlación
+print(matriz_correlacion)
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Cargar el archivo CSV en un DataFrame, especificando la codificación
+df = pd.read_csv(ruta_csv, encoding='latin-1')
+
+# Eliminar la columna 'COUNTY'
+df = df.drop('COUNTY', axis=1)
+
+# Añadir la columna que representa la proporción de nacimientos respecto al censo
+df['birth_ratio'] = df['BIRTHS2010'] / df['CENSUS2010POP']
+
+# Calcular la matriz de correlación
+correlation_matrix = df.corr()
+
+# Crear una figura y un eje con matplotlib
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Dibujar el mapa de calor de la matriz de correlación con seaborn
+sns.heatmap(correlation_matrix, annot=True, fmt=".2f", ax=ax, cmap='coolwarm')
+
+# Mostrar la gráfica
+plt.show()
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Ruta del archivo CSV
+ruta_csv = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/census.csv"
+
+# Cargar el archivo CSV en un DataFrame, especificando la codificación
+df = pd.read_csv(ruta_csv, encoding='latin-1')
+
+# Eliminar la columna 'COUNTY'
+df = df.drop('COUNTY', axis=1)
+
+# Añadir la columna que representa la proporción de nacimientos respecto al censo
+df['birth_ratio'] = df['BIRTHS2010'] / df['CENSUS2010POP']
+
+# Realizar la codificación One-Hot para las columnas categóricas
+df_encoded = pd.get_dummies(df, columns=['STNAME', 'CTYNAME'])
+
+# Calcular la matriz de correlación
+correlation_matrix = df_encoded.corr()
+
+# Crear una figura y un eje con matplotlib
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Dibujar el mapa de calor de la matriz de correlación con seaborn
+sns.heatmap(correlation_matrix, annot=True, fmt=".2f", ax=ax, cmap='coolwarm')
+
+# Mostrar la gráfica
+plt.show()
+
+DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Definir las variables de entrada y la variable objetivo
+X = df_encoded.drop('STNAME', axis=1)
+y = df_encoded['STNAME']
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Crear y entrenar el modelo de clasificación
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Hacer predicciones en el conjunto de prueba
+y_pred = model.predict(X_test)
+
+# Calcular la precisión del modelo
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: ", accuracy)
+
+KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Definir las variables de entrada y la variable objetivo
+X = df_encoded.drop('STNAME', axis=1)
+y = df_encoded['STNAME']
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Crear y entrenar el modelo de clasificación
+model = KNeighborsClassifier()
+model.fit(X_train, y_train)
+
+# Hacer predicciones en el conjunto de prueba
+y_pred = model.predict(X_test)
+
+# Calcular la precisión del modelo
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: ", accuracy)
