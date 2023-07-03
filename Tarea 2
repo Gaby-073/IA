@@ -1,0 +1,156 @@
+Librerias
+import pandas as pd
+from zipfile import ZipFile
+# Ver archivos de la carpeta
+import os
+
+ruta = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/spaceship-titanic(1)"
+archivos = os.listdir(ruta)
+print(archivos)
+
+# para extraer de la carpeta
+def unzip_data(path):
+    with ZipFile(path, 'r') as zipObj:
+        zipObj.extractall()
+from zipfile import ZipFile
+
+def unzip_data(path):
+    with ZipFile(path, 'r') as zipObj:
+        zipObj.extractall()
+
+ruta_zip = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/spaceship-titanic(1).zip"
+
+# para descomprimir un zip
+unzip_data(ruta_zip)
+
+ leer el archivo de training y el test set
+
+import pandas as pd
+
+ruta_train = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/spaceship-titanic(1)/train.csv"
+ruta_test = "/Users/gabyt/OneDrive/Documentos/Trabajos UL/2023-2/IA/spaceship-titanic(1)/test.csv"
+
+train_ds = pd.read_csv(ruta_train)
+test_ds = pd.read_csv(ruta_test)
+
+primeras 5 líneas del archivo de training
+print(train_ds.head())
+print(test_ds.head())
+datos de training y de test 
+ntrain = train_ds.shape[0]
+ntest = test_ds.shape[0]
+
+print(f'Dataset has {ntrain} train samples')
+print(f'Dataset has {ntest} test samples')
+
+tipo de datos del dataset
+train_ds.info()
+
+test_ds.info()
+valores nulos
+null_counts_train = train_ds.isnull().sum()
+
+print("Campos nulos en el training set:")
+print(null_counts_train)
+def impute_most_frequent_data(df):
+    for column_name in df.columns:
+        data = df[column_name].value_counts().index[0]
+        df[column_name].fillna(data, inplace=True)
+    return df
+
+train_ds = impute_most_frequent_data(train_ds)
+
+print(train_ds.head())
+valores nulos
+null_counts_train = train_ds.isnull().sum()
+
+print("Campos nulos en el training set después de la imputación:")
+print(null_counts_train)
+
+columnas HomePlanet y VIP
+home_planet_vs_vip = train_ds.groupby(['HomePlanet', 'VIP'])['VIP'].sum()
+
+print(home_planet_vs_vip)
+gráfico de barras 
+# Genere un grafico de barras donde
+# x = 'HomePlanet'
+# y = cantidade de personas que fueron VIP
+# rote los labels a 45°
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+ax.bar(home_planet_vs_vip.index.get_level_values('HomePlanet'), home_planet_vs_vip.values)
+ax.set_xticklabels(home_planet_vs_vip.index.get_level_values('HomePlanet'), rotation=45)
+ax.set_ylabel("How many of Each Planet are VIP people")
+plt.show()
+
+agrupacion por edad
+gastos_edad = test_ds.groupby('Age')['RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck'].sum()
+print(gastos_edad)
+
+Realizamos un gráfico de dispersión para ver cuanto gastan por edad
+fig, ax = plt.subplots(figsize=(10,6))
+for i in range(len(gastos_edad.columns)-2):
+    ax.scatter(gastos_edad.index, gastos_edad.iloc[:, i], alpha=0.8)
+    ax.legend(gastos_edad.columns[:-2])
+ax.set_xlabel("Age")
+ax.set_xticks(ticks=range(0, 80), minor=True)
+ax.set_ylabel("Quantity of Money Spent")
+ax.grid()
+
+plt.show()
+
+Histograma
+# realice un grafico de histograma para los destinos versus las características
+fig, ax = plt.subplots()
+ax.hist(train_ds['Destination'], label="Destination", color='gray')
+ax.set_xlabel("Destination")
+ax.set_ylabel("# of observations")
+ax.legend()
+plt.show()
+
+### Machine Learning
+from sklearn.preprocessing import OneHotEncoder
+def column_transform(df, categorical_columns):
+    for col in categorical_columns:
+        col_ohe = pd.get_dummies(df[col], prefix=col)
+        df = pd.concat((df, col_ohe), axis=1).drop(col, axis=1)
+    return df
+train_ds_ohe = column_transform(df=train_ds, categorical_columns=['HomePlanet', 'Destination'])
+print(train_ds_ohe.head())
+X = train_ds_ohe.drop(['PassengerId', 'Cabin', 'Name', 'Transported'], axis=1)
+
+y = train_ds_ohe['Transported']
+from sklearn.linear_model import SGDClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+Realizamos un clasificador
+from sklearn.linear_model import SGDClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+# Llamar a make_pipeline con StandardScaler() y SGDClassifier con max_iter=1000, tol=1e-3
+clf = make_pipeline(StandardScaler(), SGDClassifier(max_iter=1000, tol=1e-3))
+
+# Llamar al método fit() del clasificador para entrenar el modelo
+clf.fit(X, y)
+
+def preprocess_test_set(test_df):
+    test_df = column_transform(df=test_df, categorical_columns=['HomePlanet','Destination'])
+    test_df = test_df.drop(['PassengerId', 'Cabin', 'Name'], axis=1)
+    return impute_most_frequent_data(test_df)
+test_data = preprocess_test_set(test_df)
+predicciones
+y_pred = clf.predict(test_data)
+llegaron o no las personas (predicciones)
+import pandas as pd
+
+predictions_df = pd.DataFrame({'PassengerId': test_data['PassengerId'], 'Transported': y_pred})
+
+count_transported = predictions_df['Transported'].sum()
+count_not_transported = len(predictions_df) - count_transported
+
+print("Cantidad de predicciones de pasajeros transportados:", count_transported)
+print("Cantidad de predicciones de pasajeros no transportados:", count_not_transported)
